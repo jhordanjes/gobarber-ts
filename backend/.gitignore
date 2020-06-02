@@ -13,4 +13,8 @@ node_modules/
 # dotenv environment variables file
 .env
 
-tmp/uploads
+tmp/*
+!tmp/.gitkeep
+.idea/
+.vscode/
+build/
