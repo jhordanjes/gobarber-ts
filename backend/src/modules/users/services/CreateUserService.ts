@@ -1,8 +1,10 @@
-import { getRepository } from 'typeorm';
-import { hash } from 'bcryptjs';
+import "reflect-metadata";
+import { injectable, inject } from 'tsyringe';
 
 import AppError from '@shared/errors/AppError';
+import IUserRepository from '../repositories/IUsersRepository';
 import User from '../infra/typeorm/entities/User';
+import IHashProvider  from '../providers/hashProvider/models/IHashProvider';
 
 interface Request {
   name: string;
@@ -10,27 +12,31 @@ interface Request {
   password: string;
 }
 
+@injectable()
 class CreateUserService {
-  public async execute({ name, email, password }: Request): Promise<User> {
-    const usersRepository = getRepository(User);
 
-    const checkUserExists = await usersRepository.findOne({
-      where: { email },
-    });
+  constructor(
+    @inject('UsersRepository')
+    private usersRepository: IUserRepository,
+
+    @inject('HashProvider')
+    private hashProvider: IHashProvider,
+  ){}
+
+  public async execute({ name, email, password }: Request): Promise<User> {
+    const checkUserExists = await this.usersRepository.findByEmail(email);
 
     if (checkUserExists) {
       throw new AppError('Email address already exists');
     }
 
-    const hashedPassword = await hash(password, 8);
+    const hashedPassword = await this.hashProvider.generateHash(password);
 
-    const user = usersRepository.create({
+    const user = await this.usersRepository.create({
       name,
       email,
       password: hashedPassword,
     });
-
-    await usersRepository.save(user);
 
     return user;
   }
