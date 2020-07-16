@@ -1,4 +1,4 @@
-import "reflect-metadata";
+import 'reflect-metadata';
 import { startOfHour } from 'date-fns';
 import { injectable, inject } from 'tsyringe';
 
@@ -14,10 +14,9 @@ interface IRequest {
 
 @injectable()
 class CreateAppointmentService {
-
   constructor(
     @inject('AppointmentsRepository')
-    private appointmentsRepository: IAppointmentRepository
+    private appointmentsRepository: IAppointmentRepository,
   ) {}
 
   public async execute({ provider_id, date }: IRequest): Promise<Appointment> {

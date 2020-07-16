@@ -1,9 +1,8 @@
+import AppError from '@shared/errors/AppError';
 import ResetPasswordService from './ResetPasswordService';
 import FakeUsersRepository from '../repositories/fakes/FakeUsersRepository';
 import FakeUserTokensRepository from '../repositories/fakes/FakeUserTokensRepository';
 import FakeHashProvider from '../providers/hashProvider/fakes/FakeHashProvider';
-
-import AppError from '@shared/errors/AppError';
 
 let fakeUsersRepository: FakeUsersRepository;
 let fakeUserTokensRepository: FakeUserTokensRepository;
@@ -49,18 +48,20 @@ describe('ResetPasswordService', () => {
       resetPassword.execute({
         token: 'non-existing-token',
         password: '123456',
-      })
+      }),
     ).rejects.toBeInstanceOf(AppError);
   });
 
   it('shoud not be able to reset the password non-existing user', async () => {
-    const { token } = await fakeUserTokensRepository.generate('non-existing-user');
+    const { token } = await fakeUserTokensRepository.generate(
+      'non-existing-user',
+    );
 
     await expect(
       resetPassword.execute({
         token,
         password: '123456',
-      })
+      }),
     ).rejects.toBeInstanceOf(AppError);
   });
 
@@ -78,14 +79,11 @@ describe('ResetPasswordService', () => {
       return customDate.setHours(customDate.getHours() + 3);
     });
 
-    await expect(resetPassword.execute({
-      password: '123123',
-      token,
-    })).rejects.toBeInstanceOf(AppError);
-
+    await expect(
+      resetPassword.execute({
+        password: '123123',
+        token,
+      }),
+    ).rejects.toBeInstanceOf(AppError);
   });
 });
-
-
-//Hash
-//2h expiração
