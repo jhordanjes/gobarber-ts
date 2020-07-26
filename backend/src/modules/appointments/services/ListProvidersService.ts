@@ -21,7 +21,7 @@ class ListProvidersService {
 
   public async execute({ user_id }: IRequest): Promise<User[]> {
     let users = await this.cacheProvider.recover<User[]>(
-      `provider-list:${user_id}`,
+      `providers-list:${user_id}`,
     );
 
     if (!users) {
@@ -29,8 +29,7 @@ class ListProvidersService {
         except_user_id: user_id,
       });
 
-      console.log('A query no banco fi feita, manah');
-      await this.cacheProvider.save(`provider-list:${user_id}`, users);
+      await this.cacheProvider.save(`providers-list:${user_id}`, users);
     }
 
     return users;
